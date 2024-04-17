@@ -1,25 +1,25 @@
 {
     "format_version": 2,
-    "tooth": "my-plugin",
-    "version": "0.0.0",
+    "tooth": "github.com/odorajbotoj/HiLLPlugin",
+    "version": "0.0.1",
     "info": {
-        "name": "My Plugin Name",
-        "description": "My Plugin Description",
-        "author": "My Name",
+        "name": "HiLLPlugin",
+        "description": "Hi LeviLamina Plugin!",
+        "author": "odorajbotoj",
         "tags": [
             "levilamina",
             "plugin"
         ]
     },
-    "asset_url": "My Asset Url",
+    "asset_url": "#",
     "prerequisites": {
-        "github.com/LiteLDev/LeviLamina": "My LeviLamina Dependency Version"
+        "github.com/LiteLDev/LeviLamina": "0.11.x"
     },
     "files": {
         "place": [
             {
-                "src": "my-plugin/*",
-                "dest": "plugins/my-plugin/"
+                "src": "HiLLPlugin/*",
+                "dest": "plugins/HiLLPlugin/"
             }
         ]
     }
