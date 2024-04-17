@@ -11,7 +11,7 @@
             "plugin"
         ]
     },
-    "asset_url": "#",
+    "asset_url": "https://github.com/odorajbotoj/HiLLPlugin/releases/download/v0.0.1/HiLLPlugin.zip",
     "prerequisites": {
         "github.com/LiteLDev/LeviLamina": "0.11.x"
     },
