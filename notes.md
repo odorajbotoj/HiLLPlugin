@@ -81,7 +81,7 @@ lambda函数中，如果要调用控制台输出，应将原版文档中的 `get
 
 ```cpp
 auto& suicideCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand("suicide", "Commits suicide", CommandPermissionLevel::Any);
-suicideCommand.overload().execute<[](CommandOrigin const& origin, CommandOutput& output){
+suicideCommand.overload().execute([](CommandOrigin const& origin, CommandOutput& output){
     auto* entity = origin.getEntity();
     if (entity == nullptr || !entity->isType(ActorType::Player)) {
         output.error("Only players can commit suicide");
@@ -92,10 +92,12 @@ suicideCommand.overload().execute<[](CommandOrigin const& origin, CommandOutput&
     player->kill();
 
     hi_ll_plugin::HiLLPlugin::getInstance().getSelf().getLogger().info("{} killed themselves", player->getRealName());
-}>();
+});
 ```
 
 其实很好理解：第一步，获取或创建指令对象（此处行为是创建）。第二步，设置指令重载并设置相应的回调。
+
+LeviLamina不提供手动解注册命令的方式。
 
 按照教程给出的带参数指令示例，我们可以尝试写出一个带参数指令：
 
@@ -106,7 +108,7 @@ struct HelloParam {
     std::string name;
 };
 auto& helloCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand("hello", "say hello", CommandPermissionLevel::Any);
-helloCommand.overload<HelloParam>().required("action").optional("name").execute<[](CommandOrigin const& origin, CommandOutput& output, HelloParam const& param){
+helloCommand.overload<HelloParam>().required("action").optional("name").execute([](CommandOrigin const& origin, CommandOutput& output, HelloParam const& param){
     auto* entity = origin.getEntity();
     if (entity == nullptr || !entity->isType(ActorType::Player)) {
         output.error("Only players can say hello");
@@ -126,7 +128,7 @@ helloCommand.overload<HelloParam>().required("action").optional("name").execute<
         break;
     }
     return;
-}>();
+});
 ```
 
 `struct HelloParam` 中不止能写enum和string，还可以写其他的[参数类型](https://zh.minecraft.wiki/w/%E5%8F%82%E6%95%B0%E7%B1%BB%E5%9E%8B)。
