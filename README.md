@@ -18,7 +18,7 @@ lip install github.com/odorajbotoj/HiLLPlugin
 
 参见[better-suicide](https://lippkg.com/futrime/better-suicide/0.5.0)与[开发教程](https://levilamina.liteldev.com/zh/tutorials/create_your_first_plugin/)。
 
-`notes.md` 为开发笔记。
+仓库中 `notes.md` 为开发笔记。
 
 ## License
 
