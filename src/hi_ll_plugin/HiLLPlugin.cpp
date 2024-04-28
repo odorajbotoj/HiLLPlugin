@@ -83,7 +83,7 @@ bool HiLLPlugin::enable() {
 
     // suicide command
     auto& suicideCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand("suicide", "Commits suicide", CommandPermissionLevel::Any);
-    suicideCommand.overload().execute<[](CommandOrigin const& origin, CommandOutput& output){
+    suicideCommand.overload().execute([](CommandOrigin const& origin, CommandOutput& output){
         auto* entity = origin.getEntity();
         if (entity == nullptr || !entity->isType(ActorType::Player)) {
             output.error("Only players can commit suicide");
@@ -94,7 +94,7 @@ bool HiLLPlugin::enable() {
         player->kill();
 
         hi_ll_plugin::HiLLPlugin::getInstance().getSelf().getLogger().info("{} killed themselves", player->getRealName());
-    }>();
+    });
 
     // hello command
     enum HelloAction: int {hello, hi};
@@ -103,7 +103,7 @@ bool HiLLPlugin::enable() {
         std::string name;
     };
     auto& helloCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand("hello", "say hello", CommandPermissionLevel::Any);
-    helloCommand.overload<HelloParam>().required("action").optional("name").execute<[](CommandOrigin const& origin, CommandOutput& output, HelloParam const& param){
+    helloCommand.overload<HelloParam>().required("action").optional("name").execute([](CommandOrigin const& origin, CommandOutput& output, HelloParam const& param){
         auto* entity = origin.getEntity();
         if (entity == nullptr || !entity->isType(ActorType::Player)) {
             output.error("Only players can say hello");
@@ -123,7 +123,7 @@ bool HiLLPlugin::enable() {
             break;
         }
         return;
-    }>();
+    });
 
     // player join event
     auto& eventBus = ll::event::EventBus::getInstance();
