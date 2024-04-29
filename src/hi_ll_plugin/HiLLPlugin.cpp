@@ -45,7 +45,7 @@ std::unique_ptr<ll::data::KeyValueDB> playerDb;
 ll::event::ListenerPtr playerJoinEventListener;
 ll::event::ListenerPtr playerUseItemEventListener;
 
-}
+} // namespace
 
 namespace hi_ll_plugin {
 
@@ -82,8 +82,9 @@ bool HiLLPlugin::enable() {
     // Code for enabling the plugin goes here.
 
     // suicide command
-    auto& suicideCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand("suicide", "Commits suicide", CommandPermissionLevel::Any);
-    suicideCommand.overload().execute([](CommandOrigin const& origin, CommandOutput& output){
+    auto& suicideCommand = ll::command::CommandRegistrar::getInstance()
+                               .getOrCreateCommand("suicide", "Commits suicide", CommandPermissionLevel::Any);
+    suicideCommand.overload().execute([](CommandOrigin const& origin, CommandOutput& output) {
         auto* entity = origin.getEntity();
         if (entity == nullptr || !entity->isType(ActorType::Player)) {
             output.error("Only players can commit suicide");
@@ -93,47 +94,53 @@ bool HiLLPlugin::enable() {
         auto* player = static_cast<Player*>(entity);
         player->kill();
 
-        hi_ll_plugin::HiLLPlugin::getInstance().getSelf().getLogger().info("{} killed themselves", player->getRealName());
+        hi_ll_plugin::HiLLPlugin::getInstance().getSelf().getLogger().info(
+            "{} killed themselves",
+            player->getRealName()
+        );
     });
 
     // hello command
-    enum HelloAction: int {hello, hi};
+    enum HelloAction : int { hello, hi };
     struct HelloParam {
         HelloAction action;
         std::string name;
     };
-    auto& helloCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand("hello", "say hello", CommandPermissionLevel::Any);
-    helloCommand.overload<HelloParam>().required("action").optional("name").execute([](CommandOrigin const& origin, CommandOutput& output, HelloParam const& param){
-        auto* entity = origin.getEntity();
-        if (entity == nullptr || !entity->isType(ActorType::Player)) {
-            output.error("Only players can say hello");
+    auto& helloCommand = ll::command::CommandRegistrar::getInstance()
+                             .getOrCreateCommand("hello", "say hello", CommandPermissionLevel::Any);
+    helloCommand.overload<HelloParam>().required("action").optional("name").execute(
+        [](CommandOrigin const& origin, CommandOutput& output, HelloParam const& param) {
+            auto* entity = origin.getEntity();
+            if (entity == nullptr || !entity->isType(ActorType::Player)) {
+                output.error("Only players can say hello");
+                return;
+            }
+
+            auto* player = static_cast<Player*>(entity);
+
+            switch (param.action) {
+            case hello:
+                if (param.name != "") player->sendMessage("hello! " + param.name);
+                else player->sendMessage("hello! player");
+                break;
+            case hi:
+                if (param.name != "") player->sendMessage("hi! " + param.name);
+                else player->sendMessage("hi! player");
+                break;
+            }
             return;
         }
-
-        auto* player = static_cast<Player*>(entity);
-
-        switch (param.action) {
-        case hello:
-            if (param.name != "") player->sendMessage("hello! "+param.name);
-            else player->sendMessage("hello! player");
-            break;
-        case hi:
-            if (param.name != "") player->sendMessage("hi! "+param.name);
-            else player->sendMessage("hi! player");
-            break;
-        }
-        return;
-    });
+    );
 
     // player join event
-    auto& eventBus = ll::event::EventBus::getInstance();
+    auto& eventBus          = ll::event::EventBus::getInstance();
     playerJoinEventListener = eventBus.emplaceListener<ll::event::player::PlayerJoinEvent>(
         [doGiveClockOnFirstJoin = config.doGiveClockOnFirstJoin,
-        &logger,
-        &playerDb = playerDb](ll::event::player::PlayerJoinEvent& event){
+         &logger,
+         &playerDb = playerDb](ll::event::player::PlayerJoinEvent& event) {
             if (doGiveClockOnFirstJoin) {
-                auto& player = event.self();
-                const auto& uuid = player.getUuid();
+                auto&       player = event.self();
+                const auto& uuid   = player.getUuid();
 
                 // check if the player has joined before
                 if (!playerDb->get(uuid.asString())) {
@@ -152,26 +159,21 @@ bool HiLLPlugin::enable() {
                     logger.info("First join of {}! Giving them a clock", player.getRealName());
                 }
             }
-        });
-    
+        }
+    );
+
     // player use item event
     playerUseItemEventListener =
-        eventBus.emplaceListener<ll::event::PlayerUseItemEvent>(
-            [enableClockMenu = config.enableClockMenu,
-            &logger](ll::event::PlayerUseItemEvent& event) {
+        eventBus.emplaceListener<ll::event::PlayerUseItemEvent>([enableClockMenu = config.enableClockMenu,
+                                                                 &logger](ll::event::PlayerUseItemEvent& event) {
             if (enableClockMenu) {
                 auto& player    = event.self();
                 auto& itemStack = event.item();
 
                 if (itemStack.getRawNameId() == "clock") {
-                    ll::form::ModalForm form(
-                        "Warning",
-                        "Are you sure you want to kill yourself?",
-                        "Yes",
-                        "No"
-                    );
-                    
-                    form.sendTo(player, [&logger](Player& player, auto button, auto reason){
+                    ll::form::ModalForm form("Warning", "Are you sure you want to kill yourself?", "Yes", "No");
+
+                    form.sendTo(player, [&logger](Player& player, auto button, auto reason) {
                         (void)reason;
                         if (button == ll::form::ModalFormSelectedButton::Upper) {
                             player.kill();
