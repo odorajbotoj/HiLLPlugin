@@ -2,7 +2,7 @@
 
 LL新手的学习 ~~（踩坑）~~ 笔记
 
-本日志基于 `LeviLamina 0.11.1` 。
+本日志基于 `LeviLamina 0.12.1` 。
 
 ## 0. 不要害怕
 
@@ -23,29 +23,24 @@ LL新手的学习 ~~（踩坑）~~ 笔记
 接下来就与原文档有所出入了。在最新 *(1ecd534)* 版本的模板中，操作应如下：
 
 1. 按照命名惯例修改 `src/plugin` 文件夹的名字，例如我改成了 `hi_ll_plugin` 。然后进入该文件夹。
-
 2. 貌似 `LeviLamina` 在 `0.11.x` 版本中改动了内存管理相关，故文件夹下会多出 `MemoryOperators.cpp` 文件，不要动它。
-
 3. 重命名 `MyPlugin.h/cpp` ，例如我改成了 `HiLLPlugin.h/cpp` 。
-
 4. 编辑 `HiLLPlugin.h` ，按照惯例，重命名 `my_plugin` 命名空间为之前目录的名字，重命名 `MyPlugin` 类为之前文件的名字。记住类里面的几个声明也要改一下。
-
 5. 编辑 `HiLLPlugin.cpp` ，修改第一行以匹配之前重命名的文件。然后仿照步骤4对文件内容进行修改。注意不要遗漏一些细枝末节。
 
 ## 3. 构建你的插件
 
 直接照做就行，没啥坑。
 
+当上游LeviLamina更新时，需要执行 `xmake repo -u` 来进行依赖库更新。若更新失败，可先使用 `xmake c -a` 清除全部缓存。
+
 ## 4. 注册指令
 
 首先认识下 `load/unload` 、 `enable/disable` 函数：
 
 + `load` 在dll插件加载时执行
-
 + `enable` 在dll插件启用时执行
-
 + `disable` 在dll插件禁用时执行
-
 + `unload` 在dll插件卸载时执行
 
 所以正常的流程是： `load -> enable -> (server stop) -> dlsable`，即 `加载 -> 启用 -> 禁用` 。
@@ -55,7 +50,6 @@ LL新手的学习 ~~（踩坑）~~ 笔记
 手动卸载时，先禁用插件，后执行卸载，故流程为 `load -> enable -> (unload plugin) -> disable -> unload` 。
 
 + *OEOTYAN：额 （unload里）就反正各种异步的东西全停掉就差不多了*
-
 + *建议：不会写unload就别写*
 
 我们应在插件启用时注册指令，故内容应放在 `enable` 函数中。
